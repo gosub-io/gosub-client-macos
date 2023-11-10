@@ -1,0 +1,11 @@
+[package]
+name = "gosub-client-macos"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# kiyoshika's branch which adds more font support
+cacao = { git = "https://github.com/Kiyoshika/cacao",  branch = "feat/add-named-fonts" }
+gosub-engine = { git = "https://github.com/gosub-browser/gosub-engine" }
