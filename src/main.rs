@@ -1,11 +1,7 @@
-//! This example showcases setting up a basic application and window, setting up some views to
-//! work with autolayout, and some basic ways to handle colors.
-
 use cacao::button::Button;
 use cacao::color::Color;
 use cacao::input::{TextField, TextFieldDelegate};
 use cacao::layout::{Layout, LayoutConstraint};
-use cacao::text::{Font, Label};
 use cacao::view::View;
 
 use cacao::appkit::menu::{Menu, MenuItem};
@@ -13,9 +9,12 @@ use cacao::appkit::window::{Window, WindowConfig, WindowDelegate};
 use cacao::appkit::{App, AppDelegate};
 
 use gosub_engine::bytes::{CharIterator, Confidence};
-use gosub_engine::html5::node::NodeId;
-use gosub_engine::html5::parser::document::{Document, DocumentBuilder};
+use gosub_engine::html5::node::{Node, NodeTrait, NodeType};
+use gosub_engine::html5::parser::document::{Document, DocumentBuilder, TreeIterator};
 use gosub_engine::html5::parser::Html5Parser;
+use render_item::{RenderItem, RenderItemType};
+
+mod render_item;
 
 struct BasicApp {
     window: Window<AppWindow>,
@@ -94,6 +93,7 @@ impl TextFieldDelegate for ConsoleLogger {
 
 #[derive(Debug)]
 struct AppWindow {
+    current_render_item: RenderItem,
     input: TextField<ConsoleLogger>,
     back_button: Button,
     forward_button: Button,
@@ -105,12 +105,38 @@ struct AppWindow {
 impl AppWindow {
     pub fn new() -> Self {
         AppWindow {
+            current_render_item: RenderItem::new(),
             input: TextField::with(ConsoleLogger),
             back_button: Button::new("<"),
             forward_button: Button::new(">"),
             go_button: Button::new("Go"),
             content: View::new(),
             render_window: View::new(),
+        }
+    }
+
+    pub fn render_node(
+        &mut self,
+        force: bool,
+        current_node: &Node,
+        render_x: &mut f64,
+        render_y: &mut f64,
+    ) {
+        if force
+            || current_node.type_of() == NodeType::Element
+                && self.current_render_item.item_type != RenderItemType::Empty
+        {
+            // TODO: render_x and render_y need to be handled by a Pixels struct
+            match &self.current_render_item.item_type {
+                RenderItemType::Heading1 { .. } | RenderItemType::Paragraph { .. } => {
+                    let pixels_moved = self.current_render_item.draw_label(&self.render_window);
+                    *render_x = *render_x + pixels_moved.0;
+                    *render_y = *render_y + pixels_moved.1;
+                }
+                _ => {}
+            }
+
+            self.current_render_item.item_type = RenderItemType::Empty;
         }
     }
 }
@@ -192,11 +218,8 @@ impl WindowDelegate for AppWindow {
 
         // render some basic sample HTML just for proof of concept
 
-        let default_font = "Times New Roman";
-        let default_margin_px = 5.;
-
         let sample_html = "\
-            <html>
+            <html>\
                 <h1>sample heading</h1>\
                 <p>sample paragraph</p>\
                 <p>another sample paragraph</p>\
@@ -210,79 +233,52 @@ impl WindowDelegate for AppWindow {
         // don't worry about parse errors in proof of concept
         let _ = Html5Parser::parse_document(&mut char_iter, Document::clone(&document), None);
 
-        // gosub TODO: instead of reimplementing tree traversal, would be nice to just do
-        // something like tree.next_node() to get the next tree-order node
+        let tree_iterator = TreeIterator::new(&document);
 
-        let mut node_stack: Vec<NodeId> = Vec::new();
-        let root_id = document.get().get_root().id;
-        node_stack.push(root_id);
+        // starting render positions
+        // TODO: create a Pixels struct for this
+        let mut render_x = 5.;
+        let mut render_y = 5.;
 
         let doc_read = document.get();
 
-        // starting render positions
-        let render_x = default_margin_px;
-        let mut render_y = default_margin_px;
+        // this reference_node is mainly needed for checking the very last node in the tree
+        // to force render it. We initially set it to the root node as a dummy
+        let mut reference_node: &Node = doc_read.get_root();
 
-        while let Some(current_node_id) = node_stack.pop() {
+        for current_node_id in tree_iterator {
             let current_node = doc_read.get_node_by_id(current_node_id).unwrap();
+            reference_node = current_node;
 
-            // this would obviously be its own (set of) functions, but for prototyping
-            // i'm just dumping it here to make it easy
+            self.render_node(false, &current_node, &mut render_x, &mut render_y);
+
             match &current_node.data {
                 gosub_engine::html5::node::NodeData::Element(element) => match element.name() {
                     "h1" => {
-                        let h1 = Label::new();
-                        // gosub TODO: if a text node is appended to an element, append the content in the NodeElement itself
-                        // so we can do something like element.value() here.
-                        h1.set_text("h1 placeholder");
-                        h1.set_font(&Font::with_name(default_font, 32.));
-                        h1.set_text_color(Color::SystemBlack);
-                        self.render_window.add_subview(&h1);
-                        LayoutConstraint::activate(&[
-                            h1.left
-                                .constraint_equal_to(&self.render_window.left)
-                                .offset(render_x),
-                            h1.top
-                                .constraint_equal_to(&self.render_window.top)
-                                .offset(render_y),
-                        ]);
-
-                        // 32 for font size, 2 for default element spacing
-                        // (these would become global constants but again... prototyping)
-                        render_y = render_y + 32. + 2.;
+                        self.current_render_item = RenderItem::new_heading1();
+                        self.current_render_item.place(render_x, render_y);
                     }
                     "p" => {
-                        let p = Label::new();
-                        p.set_text("p placeholder");
-                        p.set_font(Font::with_name(default_font, 16.));
-                        p.set_text_color(Color::SystemBlack);
-                        self.render_window.add_subview(&p);
-                        LayoutConstraint::activate(&[
-                            p.left
-                                .constraint_equal_to(&self.render_window.left)
-                                .offset(render_x),
-                            p.top
-                                .constraint_equal_to(&self.render_window.top)
-                                .offset(render_y),
-                        ]);
-
-                        // 16 for font size, 2 for default element spacing
-                        // (these would become global constats but again... prototyping)
-                        render_y = render_y + 16. + 2.;
+                        self.current_render_item = RenderItem::new_paragraph();
+                        self.current_render_item.place(render_x, render_y);
                     }
                     _ => {}
                 },
+                gosub_engine::html5::node::NodeData::Text(text_body) => {
+                    match &self.current_render_item.item_type {
+                        RenderItemType::Heading1 { .. } | RenderItemType::Paragraph { .. } => {
+                            self.current_render_item.append_body(text_body.value());
+                        }
+                        _ => {}
+                    }
+                }
                 _ => {}
             }
-
-            if let Some(sibling_id) = doc_read.get_next_sibling(current_node_id) {
-                node_stack.push(sibling_id);
-            }
-
-            if !current_node.children.is_empty() {
-                node_stack.push(current_node.children[0]);
-            }
         }
+
+        // in the cases where this is the last element, it won't be rendered
+        // unless we force it
+        self.render_node(true, &reference_node, &mut render_x, &mut render_y);
 
         window.show();
     }
