@@ -5,6 +5,8 @@ use cacao::text::Font;
 use cacao::text::Label;
 use cacao::view::View;
 
+use crate::render_cursor::RenderCursor;
+
 #[derive(Debug, PartialEq)]
 pub enum RenderItemType {
     Empty,
@@ -65,7 +67,7 @@ impl RenderItem {
 
     /// Draws a label object onto the screen and returns a (x, y) tuple
     /// of how many pixels to offset the cursor for drawing the next item.
-    pub fn draw_label(&self, context: &View) -> (f64, f64) {
+    pub fn draw_label(&self, context: &View, cursor: &mut RenderCursor) {
         let label = Label::new();
         match &self.item_type {
             RenderItemType::Heading1 { body, font_size }
@@ -78,10 +80,11 @@ impl RenderItem {
                     label.left.constraint_equal_to(&context.left).offset(self.x),
                     label.top.constraint_equal_to(&context.top).offset(self.y),
                 ]);
+
                 // the +5 is for vertical padding
-                (0., *font_size + 5.)
+                cursor.adjust(0., *font_size + 5.);
             }
-            _ => (0., 0.),
+            _ => {}
         }
     }
 }

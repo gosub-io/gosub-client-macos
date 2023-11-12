@@ -12,8 +12,10 @@ use gosub_engine::bytes::{CharIterator, Confidence};
 use gosub_engine::html5::node::{Node, NodeTrait, NodeType};
 use gosub_engine::html5::parser::document::{Document, DocumentBuilder, TreeIterator};
 use gosub_engine::html5::parser::Html5Parser;
+use render_cursor::RenderCursor;
 use render_item::{RenderItem, RenderItemType};
 
+mod render_cursor;
 mod render_item;
 
 struct BasicApp {
@@ -93,6 +95,7 @@ impl TextFieldDelegate for ConsoleLogger {
 
 #[derive(Debug)]
 struct AppWindow {
+    cursor: RenderCursor,
     current_render_item: RenderItem,
     input: TextField<ConsoleLogger>,
     back_button: Button,
@@ -105,6 +108,7 @@ struct AppWindow {
 impl AppWindow {
     pub fn new() -> Self {
         AppWindow {
+            cursor: RenderCursor::new(),
             current_render_item: RenderItem::new(),
             input: TextField::with(ConsoleLogger),
             back_button: Button::new("<"),
@@ -115,23 +119,15 @@ impl AppWindow {
         }
     }
 
-    pub fn render_node(
-        &mut self,
-        force: bool,
-        current_node: &Node,
-        render_x: &mut f64,
-        render_y: &mut f64,
-    ) {
+    pub fn render_node(&mut self, force: bool, current_node: &Node) {
         if force
             || current_node.type_of() == NodeType::Element
                 && self.current_render_item.item_type != RenderItemType::Empty
         {
-            // TODO: render_x and render_y need to be handled by a Pixels struct
             match &self.current_render_item.item_type {
                 RenderItemType::Heading1 { .. } | RenderItemType::Paragraph { .. } => {
-                    let pixels_moved = self.current_render_item.draw_label(&self.render_window);
-                    *render_x = *render_x + pixels_moved.0;
-                    *render_y = *render_y + pixels_moved.1;
+                    self.current_render_item
+                        .draw_label(&self.render_window, &mut self.cursor);
                 }
                 _ => {}
             }
@@ -235,11 +231,6 @@ impl WindowDelegate for AppWindow {
 
         let tree_iterator = TreeIterator::new(&document);
 
-        // starting render positions
-        // TODO: create a Pixels struct for this
-        let mut render_x = 5.;
-        let mut render_y = 5.;
-
         let doc_read = document.get();
 
         // this reference_node is mainly needed for checking the very last node in the tree
@@ -250,17 +241,17 @@ impl WindowDelegate for AppWindow {
             let current_node = doc_read.get_node_by_id(current_node_id).unwrap();
             reference_node = current_node;
 
-            self.render_node(false, &current_node, &mut render_x, &mut render_y);
+            self.render_node(false, &current_node);
 
             match &current_node.data {
                 gosub_engine::html5::node::NodeData::Element(element) => match element.name() {
                     "h1" => {
                         self.current_render_item = RenderItem::new_heading1();
-                        self.current_render_item.place(render_x, render_y);
+                        self.current_render_item.place(self.cursor.x, self.cursor.y);
                     }
                     "p" => {
                         self.current_render_item = RenderItem::new_paragraph();
-                        self.current_render_item.place(render_x, render_y);
+                        self.current_render_item.place(self.cursor.x, self.cursor.y);
                     }
                     _ => {}
                 },
@@ -278,7 +269,7 @@ impl WindowDelegate for AppWindow {
 
         // in the cases where this is the last element, it won't be rendered
         // unless we force it
-        self.render_node(true, &reference_node, &mut render_x, &mut render_y);
+        self.render_node(true, &reference_node);
 
         window.show();
     }
