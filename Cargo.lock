@@ -272,7 +272,7 @@ dependencies = [
 [[package]]
 name = "gosub-engine"
 version = "0.1.0"
-source = "git+https://github.com/gosub-browser/gosub-engine#2755f415c72adb6215c15065254b5fa649c75082"
+source = "git+https://github.com/gosub-browser/gosub-engine#54a4a8febdc451f5136faaf8c99d801e9e869c86"
 dependencies = [
  "anyhow",
  "colored",
