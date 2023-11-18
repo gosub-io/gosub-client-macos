@@ -21,4 +21,9 @@ impl RenderCursor {
         self.x = self.x + x;
         self.y = self.y + y;
     }
+
+    pub fn reset(&mut self) {
+        self.x = 0.;
+        self.y = 0.;
+    }
 }
