@@ -10,7 +10,11 @@ Think of this as a sandbox as we develop the [Gosub Engine](https://github.com/g
 NOTE: as this client develops, this section will be expanded.
 
 ## Browser Tabs and HTML Parsing
-The client contains **browser tabs** (starting with one default) which each hold their own `RenderTree` from the gosub engine. Initially, the tree is empty. When a user enters an address (or path to local html file), it will take that HTML, parse it and build the render tree (once) and store it. That way, whenever switching between tabs, it's not reparsing the entire HTML (although this may need to change for more complex sites.)
+The client contains **browser tabs** (starting with one default) which each hold their own `RenderTree` from the gosub engine. Initially, the tree is empty. 
+
+In the near future, when a user enters an address (or path to local html file), it will take that HTML, parse it and build the render tree (once) and store it. That way, whenever switching between tabs, it's not reparsing the entire HTML (although this may need to change for more complex sites.)
+
+Currently, all browser tabs store dummy HTML for testing.
 
 ## Rendering
 Given a `RenderTree` (e.g., after selecting a tab), it will traverse the tree and check the associated node type (e.g., `TextNode`) which will determine which appkit components to use (e.g., `Label` in the case of a `TextNode`). The nodes of a render tree have different properties such as `margin`, `padding`, `font`, `font size`, etc. to help draw the appropriate sizes on the screen.
