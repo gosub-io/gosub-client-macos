@@ -536,7 +536,7 @@ dependencies = [
 [[package]]
 name = "gosub-engine"
 version = "0.1.0"
-source = "git+https://github.com/gosub-browser/gosub-engine?branch=feat/render-tree#2f4d456ead5902f3ecc245d3d5868db3374336a3"
+source = "git+https://github.com/gosub-browser/gosub-engine?branch=feat/render-tree#1d0523ddf9012f349825154fccadc82c9189605b"
 dependencies = [
  "anyhow",
  "clap",
