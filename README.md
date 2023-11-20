@@ -28,7 +28,9 @@ We are also trying to implement a render tree in the engine itself to prevent th
 
 # (Main) Next Steps
 In no particular order...
-
+* Consider switching to [core-foundation](https://github.com/servo/core-foundation-rs)
+  * Even though [cacao](https://github.com/ryanmcgrath/cacao) is very nice to use, it's unfortunately just too incomplete for what we want to do.
+  * This means the entire UI would have to be rewritten but since there's not much yet it's better to make a decision sooner rather than later
 * introduce box layout in render tree
 * integrate CSSOM to compute styles when it's built
 * support more element types
