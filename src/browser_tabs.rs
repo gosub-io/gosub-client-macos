@@ -8,9 +8,10 @@ use cacao::{
 use gosub_engine::{
     bytes::{CharIterator, Confidence},
     html5::parser::{
-        document::{Document, DocumentBuilder, DocumentHandle},
+        document::{Document, DocumentBuilder},
         Html5Parser,
     },
+    render_tree::RenderTree,
 };
 
 use crate::BasicApp;
@@ -21,14 +22,13 @@ pub enum BrowserTabAction {
     AddTab,
 }
 
-#[derive(Debug)]
 pub struct BrowserTab {
     pub(crate) name: String,
     pub(crate) tab: Button,
     pub(crate) close: Button,
     pub(crate) width: f64,
     pub(crate) padding: f64,
-    pub(crate) document: DocumentHandle,
+    pub(crate) render_tree: RenderTree,
 }
 
 impl BrowserTab {
@@ -39,7 +39,7 @@ impl BrowserTab {
             close,
             width: 200.,
             padding: 10.,
-            document: DocumentBuilder::new_document(),
+            render_tree: RenderTree::new(&DocumentBuilder::new_document()),
         }
     }
 
@@ -49,11 +49,13 @@ impl BrowserTab {
         char_iter.set_confidence(Confidence::Certain);
 
         // don't worry about parse errors in proof of concept
-        let _ = Html5Parser::parse_document(&mut char_iter, Document::clone(&self.document), None);
+        let doc = DocumentBuilder::new_document();
+        let _ = Html5Parser::parse_document(&mut char_iter, Document::clone(&doc), None);
+        self.render_tree = RenderTree::new(&doc);
+        self.render_tree.build();
     }
 }
 
-#[derive(Debug)]
 pub struct BrowserTabs {
     pub(crate) tabs: Vec<BrowserTab>,
     pub(crate) new_tab: Box<Button>,
@@ -107,7 +109,17 @@ impl BrowserTabs {
             .push(BrowserTab::new(tab_name, tab_button, close_button));
 
         // insert temporary HTML just to display something.
-        let temp_html = format!("<html><h1>Tab {}</h1></html>", next_tab_idx);
+        let temp_html = format!(
+            "<html>\
+            <h1>Tab {next_tab_idx}</h1>\
+            <h2>heading 2</h2>\
+            <h3>heading 3</h3>\
+            <h4>heading 4</h4>\
+            <h5>heading 5</h5>\
+            <h6>heading 6</h6>\
+            <p>paragraph</p>\
+            </html>"
+        );
         let tab_mut = self.tabs.last_mut().unwrap();
         tab_mut.set_html(&temp_html);
     }

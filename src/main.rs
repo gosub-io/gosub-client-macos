@@ -10,14 +10,10 @@ use cacao::appkit::menu::{Menu, MenuItem};
 use cacao::appkit::window::{Window, WindowConfig, WindowDelegate};
 use cacao::appkit::{App, AppDelegate};
 
-use gosub_engine::html5::node::{Node, NodeTrait, NodeType};
-use gosub_engine::html5::parser::document::{Document, DocumentHandle, TreeIterator};
-use render_cursor::RenderCursor;
-use render_item::{Remove, RenderItem, RenderItemType};
+use gosub_engine::render_tree::{RenderTree, TreeIterator};
 
 pub mod browser_tabs;
-pub mod render_cursor;
-pub mod render_item;
+pub mod draw;
 
 struct BasicApp {
     window: Window<AppWindow>,
@@ -94,10 +90,7 @@ impl TextFieldDelegate for ConsoleLogger {
     }
 }
 
-#[derive(Debug)]
 struct AppWindow {
-    cursor: RenderCursor,
-    rendered_items: Vec<RenderItem>,
     input: TextField<ConsoleLogger>,
     back_button: Button,
     forward_button: Button,
@@ -110,8 +103,6 @@ struct AppWindow {
 impl AppWindow {
     pub fn new() -> Self {
         AppWindow {
-            cursor: RenderCursor::new(),
-            rendered_items: Vec::new(),
             input: TextField::with(ConsoleLogger),
             back_button: Button::new("<"),
             forward_button: Button::new(">"),
@@ -122,76 +113,21 @@ impl AppWindow {
         }
     }
 
-    pub fn render_node(&mut self, force: bool, current_node: &Node) {
-        if force || current_node.type_of() == NodeType::Element {
-            if let Some(current_render_item) = &mut self.rendered_items.last_mut() {
-                match &current_render_item.item_type {
-                    RenderItemType::Empty => return,
-                    RenderItemType::Heading1(text) | RenderItemType::Paragraph(text) => {
-                        current_render_item.draw_label(&self.render_window, &mut self.cursor);
-                    }
-                    _ => {}
+    pub fn render_html(&self, render_tree: &RenderTree) {
+        // TODO: need to implement a new way to "clear" the view, although
+        // it would be nice to do modify cacao directly and add a new .remove_all_subviews()
+        // method so we don't have to keep track
+
+        let tree_iterator = TreeIterator::new(render_tree);
+
+        for current_node in tree_iterator {
+            match &current_node.borrow().node_type {
+                gosub_engine::render_tree::NodeType::Text(text_node) => {
+                    draw::draw_text(&self.render_window, &current_node.borrow(), text_node);
                 }
+                _ => { /* TODO: others when we add more types */ }
             }
         }
-    }
-
-    pub fn render_html(&mut self, document: &DocumentHandle) {
-        for render_item in &mut self.rendered_items {
-            render_item.remove();
-        }
-        self.rendered_items.clear();
-        self.cursor.reset();
-
-        let tree_iterator = TreeIterator::new(&document);
-
-        let doc_read = document.get();
-
-        // this reference_node is mainly needed for checking the very last node in the tree
-        // to force render it. We initially set it to the root node as a dummy
-        let mut reference_node: &Node = doc_read.get_root();
-
-        for current_node_id in tree_iterator {
-            let current_node = doc_read.get_node_by_id(current_node_id).unwrap();
-            reference_node = current_node;
-
-            self.render_node(false, &current_node);
-
-            match &current_node.data {
-                gosub_engine::html5::node::NodeData::Element(element) => match element.name() {
-                    "h1" => {
-                        self.rendered_items.push(RenderItem::new_heading1());
-                        self.rendered_items
-                            .last_mut()
-                            .unwrap()
-                            .place(self.cursor.x, self.cursor.y);
-                    }
-                    "p" => {
-                        self.rendered_items.push(RenderItem::new_paragraph());
-                        self.rendered_items
-                            .last_mut()
-                            .unwrap()
-                            .place(self.cursor.x, self.cursor.y);
-                    }
-                    _ => {}
-                },
-                gosub_engine::html5::node::NodeData::Text(text_body) => {
-                    let mut current_render_item = self.rendered_items.last_mut().unwrap();
-
-                    match &mut current_render_item.item_type {
-                        RenderItemType::Heading1(text) | RenderItemType::Paragraph(text) => {
-                            current_render_item.append_body(text_body.value());
-                        }
-                        _ => {}
-                    }
-                }
-                _ => {}
-            }
-        }
-
-        // in the cases where this is the last element, it won't be rendered
-        // unless we force it
-        self.render_node(true, &reference_node);
     }
 }
 
@@ -316,9 +252,8 @@ impl Dispatcher for BasicApp {
                 },
                 BrowserTabAction::ClickedTab(idx) => unsafe {
                     let mutable_window = &mut *mut_ptr;
-                    let doc_clone =
-                        Document::clone(&mutable_window.browser_tabs.tabs[*idx].document);
-                    mutable_window.render_html(&doc_clone);
+                    let render_tree = &mutable_window.browser_tabs.tabs[*idx].render_tree;
+                    mutable_window.render_html(render_tree);
                 },
             }
         }

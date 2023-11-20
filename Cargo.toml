@@ -8,4 +8,4 @@ edition = "2021"
 [dependencies]
 # kiyoshika's branch which adds more font support
 cacao = { git = "https://github.com/Kiyoshika/cacao",  branch = "feat/add-named-fonts" }
-gosub-engine = { git = "https://github.com/gosub-browser/gosub-engine" }
+gosub-engine = { git = "https://github.com/gosub-browser/gosub-engine", branch = "feat/render-tree" }
