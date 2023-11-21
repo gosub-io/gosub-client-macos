@@ -10,7 +10,7 @@ Think of this as a sandbox as we develop the [Gosub Engine](https://github.com/g
 NOTE: as this client develops, this section will be expanded.
 
 ## Browser Tabs and HTML Parsing
-The client contains **browser tabs** (starting with one default) which each hold their own `RenderTree` from the gosub engine. Initially, the tree is empty. 
+The client contains **browser tabs** (starting with one default) which each hold their own `RenderTree` from the gosub engine. Initially, the tree is empty.
 
 In the near future, when a user enters an address (or path to local html file), it will take that HTML, parse it and build the render tree (once) and store it. That way, whenever switching between tabs, it's not reparsing the entire HTML (although this may need to change for more complex sites.)
 
@@ -31,6 +31,8 @@ In no particular order...
 * Consider switching to [core-foundation](https://github.com/servo/core-foundation-rs)
   * Even though [cacao](https://github.com/ryanmcgrath/cacao) is very nice to use, it's unfortunately just too incomplete for what we want to do.
   * This means the entire UI would have to be rewritten but since there's not much yet it's better to make a decision sooner rather than later
+* Consider writing the UI in SwiftUI and interact with the engine through HTTP
+    * This is an alternative if the other bindings are too difficult/inconvenient to use, we would send information from the gosub-engine regarding what to render through HTTP which is read by Swift and used to build the objects.
 * introduce box layout in render tree
 * integrate CSSOM to compute styles when it's built
 * support more element types
