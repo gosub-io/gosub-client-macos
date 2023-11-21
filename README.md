@@ -32,7 +32,11 @@ In no particular order...
   * Even though [cacao](https://github.com/ryanmcgrath/cacao) is very nice to use, it's unfortunately just too incomplete for what we want to do.
   * This means the entire UI would have to be rewritten but since there's not much yet it's better to make a decision sooner rather than later
 * Consider writing the UI in SwiftUI and interact with the engine through HTTP
-    * This is an alternative if the other bindings are too difficult/inconvenient to use, we would send information from the gosub-engine regarding what to render through HTTP which is read by Swift and used to build the objects.
+  * This is an alternative if the other bindings are too difficult/inconvenient to use, we would send information from the gosub-engine regarding what to render through HTTP which is read by Swift and used to build the objects.
+* Consider using FFI to expose Rust to Swift
+  * This is an alternative to using HTTP and the overhead of serializing/deserializing JSON or some other format between the languages.
+  * We would likely need separate "FFI-specific" wrappers that "convert" the Rust structs into C-friendly structs (or at least expose certain pointers to Swift)
+  * We primarily need to expose just the `RenderTree` (for now) and maybe some methods from it
 * introduce box layout in render tree
 * integrate CSSOM to compute styles when it's built
 * support more element types
