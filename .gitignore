@@ -1,3 +1,5 @@
-lib/*.a
-include/*.h
+!lib/.gitkeep
+lib/*
+!include/.gitkeep
+include/*
 .DS_Store
