@@ -338,7 +338,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INCLUDE_PATHS = "\"$(SRCROOT)/include\"";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/zach/Development/gosub-client-macos/gosub-client-macos-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$PROJECT_DIR/gosub-client-macos-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -370,7 +370,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INCLUDE_PATHS = "\"$(SRCROOT)/include\"";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/zach/Development/gosub-client-macos/gosub-client-macos-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$PROJECT_DIR/gosub-client-macos-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
