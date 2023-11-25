@@ -28,4 +28,8 @@ public class RenderTree {
             }
         }
     }
+    
+    deinit {
+        render_tree_free(&self.renderTree);
+    }
 }
