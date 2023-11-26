@@ -1,16 +1,16 @@
 import Foundation
 
 public class RenderTree {
-    var renderTree: UnsafeMutablePointer<render_tree_t>?;
+    var renderTree: render_tree_t = render_tree_t();
     public var renderList: [RenderItem] = []
     
     init(html: String) {
-        self.renderTree = render_tree_init(html);
+        render_tree_init(&self.renderTree, html);
         // skip root
-        var currentNode: UnsafePointer<node_t>? = render_tree_next(self.renderTree);
+        var currentNode: UnsafePointer<node_t>? = render_tree_next(&self.renderTree);
         
         while (true) {
-            currentNode = render_tree_next(self.renderTree);
+            currentNode = render_tree_next(&self.renderTree);
             if (currentNode == nil) {
                 break;
             }
