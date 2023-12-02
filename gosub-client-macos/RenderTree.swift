@@ -17,10 +17,10 @@ public class RenderTree {
             switch (currentNode.unsafelyUnwrapped.pointee.type) {
             case NODE_TYPE_ROOT: continue
             case NODE_TYPE_TEXT: do {
-                let value = String(cString: render_tree_node_text_value(currentNode))
-                let font = String(cString: render_tree_node_text_font(currentNode))
-                let fontSize = CGFloat(render_tree_node_text_font_size(currentNode))
-                let isBold = render_tree_node_text_bold(currentNode)
+                let value = String(cString: render_tree_node_text_get_value(currentNode))
+                let font = String(cString: render_tree_node_text_get_font(currentNode))
+                let fontSize = CGFloat(render_tree_node_text_get_font_size(currentNode))
+                let isBold = render_tree_node_text_get_bold(currentNode)
                 let x = render_tree_node_get_x(currentNode);
                 let y = render_tree_node_get_y(currentNode);
                 let textItem = TextItem(value: value, font: font, fontSize: fontSize, isBold: isBold);
