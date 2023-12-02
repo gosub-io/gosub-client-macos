@@ -19,9 +19,13 @@ public class RenderTree {
             case NODE_TYPE_TEXT: do {
                 let value = String(cString: render_tree_node_text_value(currentNode))
                 let font = String(cString: render_tree_node_text_font(currentNode))
-                let font_size = CGFloat(render_tree_node_text_font_size(currentNode))
-                let is_bold = render_tree_node_text_bold(currentNode)
-                self.renderList.append(TextItem(value: value, font: font, font_size: font_size, is_bold: is_bold))
+                let fontSize = CGFloat(render_tree_node_text_font_size(currentNode))
+                let isBold = render_tree_node_text_bold(currentNode)
+                let x = render_tree_node_get_x(currentNode);
+                let y = render_tree_node_get_y(currentNode);
+                let textItem = TextItem(value: value, font: font, fontSize: fontSize, isBold: isBold);
+                textItem.setXY(x: x, y: y);
+                self.renderList.append(textItem)
             }
             default:
                 continue

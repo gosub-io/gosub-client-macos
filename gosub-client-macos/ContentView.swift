@@ -20,30 +20,13 @@ struct ContentView: View {
     }
     
     var body: some View {
-        /*
-         NOTE: below will be the actual code used when we get position
-         information from the RenderItems, but as a temporary measure we will
-         use VStack
          
          ZStack(alignment: .topLeading) {
              Color.white.ignoresSafeArea()
-             ForEach(self.content) { render_item in
-                 render_item.getBody().offset(x: 0, y: 0)
+             ForEach(self.content) { renderItem in
+                 renderItem.getBody().offset(x: renderItem.x, y: renderItem.y)
              }
          }
-         */
-        ZStack {
-            Color.white.ignoresSafeArea()
-            HStack {
-                VStack(alignment: .leading) {
-                    ForEach(self.content) { render_item in
-                        render_item.getBody()
-                    }
-                    Spacer()
-                }
-                Spacer()
-            }
-        }
     }
 }
 
