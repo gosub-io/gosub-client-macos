@@ -1,0 +1,3 @@
+[submodule "gosub-engine"]
+	path = gosub-engine
+	url = git@github.com:gosub-browser/gosub-engine.git
