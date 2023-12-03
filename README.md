@@ -14,5 +14,6 @@ Then run `make` which will compile the Gosub engine, its bindings, and export th
 # Updating
 If the C API has changed/updated in the engine, use `make update` and `make` to update the bindings.
 
-# Preview (as of 25 Nov 2023)
-![image](https://github.com/gosub-browser/gosub-client-macos/assets/49159969/ed546d09-5893-4736-9694-6f0651607b5a)
+# Preview (as of 3 Dec 2023)
+<img width="964" alt="image" src="https://github.com/gosub-browser/gosub-client-macos/assets/49159969/3b2c13fb-cb8f-4636-b57b-cf37cdb4b160">
+
