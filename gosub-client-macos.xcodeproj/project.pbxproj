@@ -18,6 +18,7 @@
 		927BD9812B11AA99001693B8 /* RenderItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 927BD9802B11AA99001693B8 /* RenderItem.swift */; };
 		927BD9832B11AD08001693B8 /* TextItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 927BD9822B11AD08001693B8 /* TextItem.swift */; };
 		927BD9852B11BB92001693B8 /* RenderTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 927BD9842B11BB92001693B8 /* RenderTree.swift */; };
+		92F2494B2B1C1C720078D3B3 /* BrowserTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F2494A2B1C1C720078D3B3 /* BrowserTab.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,7 @@
 		927BD9802B11AA99001693B8 /* RenderItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderItem.swift; sourceTree = "<group>"; };
 		927BD9822B11AD08001693B8 /* TextItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextItem.swift; sourceTree = "<group>"; };
 		927BD9842B11BB92001693B8 /* RenderTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderTree.swift; sourceTree = "<group>"; };
+		92F2494A2B1C1C720078D3B3 /* BrowserTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserTab.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +83,7 @@
 				927BD9802B11AA99001693B8 /* RenderItem.swift */,
 				927BD9822B11AD08001693B8 /* TextItem.swift */,
 				927BD9842B11BB92001693B8 /* RenderTree.swift */,
+				92F2494A2B1C1C720078D3B3 /* BrowserTab.swift */,
 			);
 			path = "gosub-client-macos";
 			sourceTree = "<group>";
@@ -176,6 +179,7 @@
 			files = (
 				927BD9562B1193BF001693B8 /* ContentView.swift in Sources */,
 				927BD9832B11AD08001693B8 /* TextItem.swift in Sources */,
+				92F2494B2B1C1C720078D3B3 /* BrowserTab.swift in Sources */,
 				927BD9812B11AA99001693B8 /* RenderItem.swift in Sources */,
 				927BD9542B1193BF001693B8 /* gosub_client_macosApp.swift in Sources */,
 				927BD9852B11BB92001693B8 /* RenderTree.swift in Sources */,
