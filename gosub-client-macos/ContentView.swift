@@ -1,24 +1,12 @@
 import SwiftUI
 
 struct ContentView: View {
-    var content: [RenderItem] = []
+    @State private var content: [RenderItem] = []
     @State private var browserTabs: [BrowserTab] = []
     @State private var urlText = ""
     
-    init() {
-        let html = """
-            <html>
-                <h1>heading 1</h1>
-                <h2>heading 2</h2>
-                <h3>heading 3</h3>
-                <h4>heading 4</h4>
-                <h5>heading 5</h5>
-                <h6>heading 6</h6>
-                <p>paragraph</p>
-            </html>
-        """
-        let renderTree = RenderTree(html: html)
-        self.content = renderTree.renderList
+    func selectTabCallback(renderList: [RenderItem]) {
+        self.content = renderList;
     }
     
     func deleteTabCallback(tabIndex: Int) {
@@ -69,7 +57,9 @@ struct ContentView: View {
                     browserTab.show()
                 }
                 Button(action: {
-                    self.browserTabs.append(BrowserTab(tabIndex: self.browserTabs.count, tabName: "New Tab", deleteTabCallback: self.deleteTabCallback))
+                    let newTab = BrowserTab(tabIndex: self.browserTabs.count, tabName: "New Tab", selectTabCallback: self.selectTabCallback, deleteTabCallback: self.deleteTabCallback);
+                    newTab.renderHTML(html: "<html><h1>tab " + String(self.browserTabs.count) + "</h1></html>");
+                    self.browserTabs.append(newTab)
                 }) {
                     Image(systemName: "plus")
                 }.background(Color.blue).clipShape(Circle())

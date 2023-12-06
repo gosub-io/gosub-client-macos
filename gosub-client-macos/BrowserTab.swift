@@ -10,20 +10,26 @@ import SwiftUI
 
 public class BrowserTab : Identifiable {
     public var id = UUID()
+    public var selectTabCallback: ([RenderItem]) -> ()
     public var deleteTabCallback: (Int) -> ()
     public var tabIndex: Int
     private let tabName: String
+    private var renderTree: RenderTree = RenderTree(html: "")
     
-    public init(tabIndex: Int, tabName: String, deleteTabCallback: @escaping (Int) -> ()) {
+    public init(tabIndex: Int, tabName: String, selectTabCallback: @escaping ([RenderItem]) -> (), deleteTabCallback: @escaping (Int) -> ()) {
         self.tabIndex = tabIndex
         self.tabName = tabName
+        self.selectTabCallback = selectTabCallback
         self.deleteTabCallback = deleteTabCallback
+    }
+    
+    public func renderHTML(html: String) {
+        self.renderTree = RenderTree(html: html);
     }
     
     public func show() -> AnyView {
         return AnyView(Button(action: {
-            print("TAB INDEX: ", self.tabIndex)
-            // TODO:
+            self.selectTabCallback(self.renderTree.renderList)
         }) {
             Text(self.tabName).padding(5)
             Button(action: {
