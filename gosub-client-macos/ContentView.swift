@@ -4,8 +4,12 @@ struct ContentView: View {
     @State private var content: [RenderItem] = []
     @State private var browserTabs: [BrowserTab] = []
     @State private var urlText = ""
+    @State private var selectedTabIndex: Int = 0
     
-    func selectTabCallback(renderList: [RenderItem]) {
+    func selectTabCallback(tabIndex: Int, renderList: [RenderItem]) {
+        self.browserTabs[self.selectedTabIndex].setSelected(isSelected: false);
+        self.selectedTabIndex = tabIndex;
+        self.browserTabs[self.selectedTabIndex].setSelected(isSelected: true);
         self.content = renderList;
     }
     
